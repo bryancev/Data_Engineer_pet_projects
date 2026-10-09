@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: stg_aircraft_reference
+    description: "Справочник типов самолётов"
+
+    columns:
+      - name: aircraft_type
+        tests:
+          - not_null
+
+      - name: source_loaded_at
+        tests:
+          - not_null

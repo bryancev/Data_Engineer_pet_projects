@@ -1,0 +1,70 @@
+version: 2
+
+models:
+  - name: stg_aerodatabox_arrivals
+    description: "Staging-модель прилетающих рейсов Aerodatabox API"
+
+    columns:
+
+      - name: airport_code
+        description: "Код аэропорта"
+        tests:
+          - not_null
+
+      - name: flight_number
+        description: "Номер рейса"
+        tests:
+          - not_null
+
+      - name: direction
+        description: "Направление рейса"
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['arrival']
+
+      - name: scheduled_arrival_utc
+        description: "Плановое время прилета в UTC"
+        tests:
+          - not_null
+
+      - name: source
+        description: "Источник данных"
+        tests:
+          - not_null
+
+      - name: loaded_at
+        description: "Время загрузки данных"
+        tests:
+          - not_null
+
+      - name: flight_status
+        description: "Статус рейса"
+
+      - name: airline_iata
+        description: "IATA-код авиакомпании"
+
+      - name: airline_name
+        description: "Название авиакомпании"
+
+      - name: aircraft_registration
+        description: "Регистрационный номер самолета"
+
+      - name: aircraft_model
+        description: "Модель самолета"
+
+      - name: departure_airport_iata
+        description: "IATA-код аэропорта вылета"
+
+      - name: scheduled_departure_utc
+        description: "Плановое время вылета в UTC"
+
+      - name: revised_arrival_utc
+        description: "Обновленное время прилета в UTC"
+
+      - name: arrival_terminal
+        description: "Терминал прилета"
+
+      - name: is_cargo
+        description: "Признак грузового рейса"

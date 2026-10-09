@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: stg_weather_history
+    description: "Погодные данные по часам из JSON файла"
+
+    columns:
+      - name: airport_iata
+        description: "Код аэропорта"
+        tests:
+          - not_null
+
+      - name: weather_time_utc
+        description: "Время наблюдения"
+        tests:
+          - not_null
+
+      - name: temperature_2m_c
+        description: "Температура воздуха"
+        tests:
+          - not_null
+
+      - name: weathercode
+        description: "Код погодного состояния"
+        tests:
+          - not_null
+
+      - name: weather_description
+        description: "Описание погоды"
+        tests:
+          - not_null

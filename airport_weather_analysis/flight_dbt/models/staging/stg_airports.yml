@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: stg_airports
+    description: "Справочник аэропортов"
+    columns:
+      - name: airport_name
+        description: "Название аэропорта"
+        tests:
+          - not_null
+
+      - name: airport_country
+        description: "Страна аэропорта"
+        tests:
+          - not_null
+
+      - name: airport_iata
+        description: "IATA-код"
+        tests:
+          - unique
+
+      - name: airport_icao
+        description: "ICAO-код"
+
+
+      - name: source_loaded_at
+        tests:
+          - not_null

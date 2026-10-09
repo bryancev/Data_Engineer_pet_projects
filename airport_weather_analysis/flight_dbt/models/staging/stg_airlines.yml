@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: stg_airlines
+    description: "Справочник авиакомпаний"
+    columns:
+      - name: airline_name
+        tests:
+          - not_null
+
+      - name: iata_code
+
+      - name: icao_code
+
+      - name: airline_active
+        tests:
+          - accepted_values:
+              arguments:
+                values: [true, false]
+
+      - name: source_loaded_at
+        tests:
+          - not_null

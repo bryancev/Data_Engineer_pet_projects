@@ -1,0 +1,39 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Сырые данные из внешних API и ETL-процессов"
+    schema: raw
+    
+    tables:
+      # API данные
+      - name: weather_raw
+        description: "Почасовые наблюдения погоды из Open-Meteo API"
+        loaded_at_field: loaded_at
+        freshness:
+          warn_after: {count: 32, period: day}
+          error_after: {count: 35, period: day}
+      
+      - name: aerodatabox_fids_range
+        description: "Информация о рейсах из AeroDataBox API"
+        loaded_at_field: extracted_at
+        freshness:
+          warn_after: {count: 32, period: day}
+          error_after: {count: 35, period: day}
+      
+      # справочники
+      - name: airports
+        description: "Справочные данные по аэропортам"
+      
+      - name: airlines
+        description: "Справочные данные по авиакомпаниям"
+      
+      - name: aircraft_reference
+        description: "Справочные данные по воздушным судам"
+      
+      # исторические данные
+      - name: weather_hourly_history
+        description: "Исторические данные о погоде из JSON-файла"
+      
+      - name: flights_2025
+        description: "Исторические данные о рейсах, загруженные из parquet-файла"
