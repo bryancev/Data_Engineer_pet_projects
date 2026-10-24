@@ -15,9 +15,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: flight_db
-          POSTGRES_USER: user_1
-          POSTGRES_PASSWORD: password_1
+          POSTGRES_DB: flight
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
         ports:
           - 5432:5432
         options: >-
