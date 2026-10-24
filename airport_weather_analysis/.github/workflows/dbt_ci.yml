@@ -15,9 +15,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: flight
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: password
+          POSTGRES_DB: flight_db
+          POSTGRES_USER: user_1
+          POSTGRES_PASSWORD: password_1
         ports:
           - 5432:5432
         options: >-
@@ -25,6 +25,14 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
+    env:
+      DBT_TARGET: ci
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: flight
 
     steps:
       - uses: actions/checkout@v4
@@ -40,16 +48,18 @@ jobs:
         working-directory: flight_dbt
         run: dbt deps
 
+      - name: dbt seed
+        working-directory: flight_dbt
+        run: dbt seed --target ci --profiles-dir .
+
       - name: dbt parse
         working-directory: flight_dbt
         run: dbt parse
 
       - name: dbt compile
         working-directory: flight_dbt
-        env:
-          POSTGRES_HOST: localhost
-          POSTGRES_PORT: 5432
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: password
-          POSTGRES_DB: flight
         run: dbt compile --profiles-dir .
+
+      - name: dbt build
+        working-directory: flight_dbt
+        run: dbt build --target ci --profiles-dir . --select stg_aerodatabox_arrivals stg_aerodatabox_departures
