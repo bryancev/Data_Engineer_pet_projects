@@ -1,0 +1,5 @@
+seeds:
+  - name: raw_aerodatabox_fids_sample
+    config:
+      column_types:
+        payload: jsonb

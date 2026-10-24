@@ -17,7 +17,7 @@ with source_data as (
         cast(extracted_at as timestamptz) as loaded_at,
         cast(payload      as jsonb)       as payload
 
-    from {{ source('raw', 'aerodatabox_fids_range') }}
+    from {{ get_raw_source() }}
 
 ),
 
