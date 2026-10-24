@@ -63,7 +63,7 @@ models:
                 field: airport_iata
 
       - name: scheduled_departure_utc
-        description: "Плановое время вылета UTC"
+        description: "Плановое время вылета UTC по расписанию аэропорта"
 
       - name: actual_departure_utc
         description: "Фактическое время вылета UTC"
