@@ -1,0 +1,186 @@
+version: 2
+
+models:
+  - name: fact_flights
+    description: "{{ doc('fact_flights') }}"
+
+    tests:
+      - valid_delay_status:
+          arguments:
+            delay_column: departure_delay_minutes
+            status_column: departure_time_status
+      - valid_delay_status:
+          arguments:
+            delay_column: arrival_delay_minutes
+            status_column: arrival_time_status
+
+    columns:
+      - name: flight_key
+        description: "Суррогатный ключ рейса"
+        tests:
+          - not_null
+          - unique
+
+      - name: flight_number
+        description: "Номер рейса"
+        tests:
+          - not_null
+          - is_uppercase
+
+      - name: flight_direction
+        description: "Направление рейса"
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - arrival
+                  - departure
+
+      - name: airline_iata
+        description: "IATA-код авиакомпании"
+        tests:
+          - is_uppercase
+          - relationships:
+              arguments:
+                to: ref('dim_airlines')
+                field: iata_code
+
+      - name: airport_departure_iata
+        description: "IATA-код аэропорта вылета"
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_airports')
+                field: airport_iata
+
+      - name: airport_arrival_iata
+        description: "IATA-код аэропорта прилёта"
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_airports')
+                field: airport_iata
+
+      - name: scheduled_departure_utc
+        description: "Плановое время вылета UTC"
+
+      - name: actual_departure_utc
+        description: "Фактическое время вылета UTC"
+
+      - name: scheduled_arrival_utc
+        description: "Плановое время прилёта UTC"
+
+      - name: actual_arrival_utc
+        description: "Фактическое время прилёта UTC"
+
+      - name: departure_delay_minutes
+        description: "Задержка вылета в минутах"
+
+      - name: arrival_delay_minutes
+        description: "Задержка прилёта в минутах"
+
+      - name: operation_ts
+        description: "Основной timestamp события рейса"
+        tests:
+          - not_null
+
+      - name: operation_date
+        description: "Дата выполнения рейса"
+
+      - name: operation_hour
+        description: "Час выполнения рейса"
+
+      - name: operation_day_of_week
+        description: "День недели выполнения рейса"
+
+      - name: departure_time_status
+        description: "Категория статуса вылета"
+        tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - unknown
+                  - on_time
+                  - minor_delay
+                  - delayed
+
+      - name: arrival_time_status
+        description: "Категория статуса прилёта"
+        tests:
+          - accepted_values:
+              arguments:
+                values:
+                  - unknown
+                  - on_time
+                  - minor_delay
+                  - delayed
+
+      - name: flight_status
+        description: "Статус рейса"
+
+      - name: is_cargo
+        description: "Признак грузового рейса"
+
+      - name: aircraft_model
+        description: "Модель самолёта"
+
+      - name: aircraft_registration
+        description: "Регистрационный номер самолёта"
+
+      - name: call_sign
+        description: "Позывной рейса"
+
+      - name: airline_icao
+        description: "ICAO-код авиакомпании"
+
+
+unit_tests:
+
+  - name: test_departure_time_status
+
+    model: fact_flights
+
+    given:
+
+      - input: ref('stg_aerodatabox_departures')
+        rows:
+          - {
+              flight_number: 'SU100',
+              call_sign: 'AFL100',
+              flight_status: 'scheduled',
+              is_cargo: false,
+              direction: 'departure',
+
+              airline_iata: 'SU',
+              airline_icao: 'AFL',
+
+              aircraft_model: 'Airbus A320',
+              aircraft_registration: 'RA-12345',
+
+              airport_code: 'SVO',
+              arrival_airport_iata: 'HKT',
+
+              scheduled_departure_utc: '2026-01-01 10:00:00',
+              revised_departure_utc: '2026-01-01 10:20:00',
+
+              scheduled_arrival_utc: '2026-01-01 16:00:00',
+              revised_arrival_utc: '2026-01-01 16:15:00'
+            }
+
+      - input: ref('stg_parquet_departures')
+        rows: []
+
+      - input: ref('stg_aerodatabox_arrivals')
+        rows: []
+
+      - input: ref('stg_parquet_arrivals')
+        rows: []
+
+    expect:
+
+      rows:
+        - {
+            flight_number: 'SU100',
+            departure_time_status: 'delayed'
+          }

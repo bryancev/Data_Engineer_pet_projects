@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: dim_airlines
+    description: "Dimension-модель справочника авиакомпаний"
+
+    columns:
+
+      - name: airline_key
+        description: "Технический surrogate key авиакомпании"
+        tests:
+          - not_null
+          - unique
+
+      - name: airline_name
+        description: "Название авиакомпании"
+        tests:
+          - not_null
+
+      - name: iata_code
+        description: "IATA-код авиакомпании"
+
+      - name: icao_code
+        description: "ICAO-код авиакомпании"
+
+      - name: callsign
+        description: "Радиопозывной авиакомпании"
+
+      - name: airline_country
+        description: "Страна регистрации авиакомпании"
+
+      - name: airline_active
+        description: "Признак активности авиакомпании"

@@ -1,0 +1,55 @@
+name: dbt CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'flight_dbt/**'
+
+jobs:
+  dbt-check:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: flight
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dbt
+        run: pip install dbt-postgres
+
+      - name: dbt deps
+        working-directory: flight_dbt
+        run: dbt deps
+
+      - name: dbt parse
+        working-directory: flight_dbt
+        run: dbt parse
+
+      - name: dbt compile
+        working-directory: flight_dbt
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: flight
+        run: dbt compile --profiles-dir .

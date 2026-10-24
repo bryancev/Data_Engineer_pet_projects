@@ -1,0 +1,19 @@
+version: 2
+
+seeds:
+  - name: wmo_weather_codes
+    description: "Справочник кодов погодных явлений по стандарту WMO"
+    config:
+      column_types:
+        weathercode: integer
+        description: varchar
+    columns:
+      - name: weathercode
+        description: "Числовой код погодного явления"
+        tests:
+          - not_null
+          - unique
+      - name: description
+        description: "Описание погодного явления"
+        tests:
+          - not_null

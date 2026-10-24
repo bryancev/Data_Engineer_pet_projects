@@ -1,0 +1,50 @@
+version: 2
+
+models:
+  - name: dim_airports
+    description: "Dimension-модель справочника аэропортов"
+
+    columns:
+
+      - name: airport_key
+        description: "Технический ключ аэропорта"
+        tests:
+          - not_null
+          - unique
+
+      - name: airport_iata
+        description: "IATA-код аэропорта"
+        tests:
+          - unique
+
+
+      - name: airport_icao
+        description: "ICAO-код аэропорта"
+
+      - name: airport_name
+        description: "Название аэропорта"
+        tests:
+          - not_null
+
+      - name: airport_country
+        description: "Страна расположения аэропорта"
+        tests:
+          - not_null
+
+      - name: airport_city
+        description: "Город расположения аэропорта"
+
+      - name: airport_latitude
+        description: "Широта аэропорта"
+
+      - name: airport_longitude
+        description: "Долгота аэропорта"
+
+      - name: airport_altitude
+        description: "Высота аэропорта над уровнем моря"
+
+      - name: airport_timezone
+        description: "Часовой пояс аэропорта"
+
+      - name: airport_timezone_offset
+        description: "Смещение часового пояса относительно UTC"

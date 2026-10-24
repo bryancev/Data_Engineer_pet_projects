@@ -9,9 +9,9 @@ with source_data as (
 
     select
         source,
-        airport_iata,
+        upper(trim(airport_iata)) as airport_iata,
         loaded_at,
-        cast(payload as jsonb) as payload
+        cast(payload as jsonb)    as payload
     from {{ source('raw', 'weather_raw') }}
 
 ),
@@ -60,69 +60,69 @@ typed as (
     select
         source,
         airport_iata,
-        cast(loaded_at as timestamp)                       as loaded_at,
+        cast(loaded_at as timestamp)   as loaded_at,
 
-        cast(weather_time as timestamp)                    as weather_time_utc,
+        cast(weather_time as timestamp) as weather_time_utc,
 
-        cast(temperature_2m        as text)::double precision  as temperature_2m_c,
-        cast(apparent_temperature  as text)::double precision  as apparent_temperature_c,
-        cast(dewpoint_2m           as text)::double precision  as dewpoint_2m_c,
+        cast(cast(temperature_2m       as text) as double precision) as temperature_2m_c,
+        cast(cast(apparent_temperature as text) as double precision) as apparent_temperature_c,
+        cast(cast(dewpoint_2m          as text) as double precision) as dewpoint_2m_c,
 
         case
-            when relative_humidity_2m::text ~ '^-?[0-9]+$'
-                then cast(relative_humidity_2m::text as integer)
+            when cast(relative_humidity_2m as text) ~ '^-?[0-9]+$'
+                then cast(cast(relative_humidity_2m as text) as integer)
             else null
         end                                                as relative_humidity_2m_pct,
 
-        cast(precipitation_mm as text)::double precision   as precipitation_mm,
-        cast(rain_mm          as text)::double precision   as rain_mm,
-        cast(snowfall_cm      as text)::double precision   as snowfall_cm,
+        cast(cast(precipitation_mm as text) as double precision) as precipitation_mm,
+        cast(cast(rain_mm          as text) as double precision) as rain_mm,
+        cast(cast(snowfall_cm      as text) as double precision) as snowfall_cm,
 
         case
-            when cloudcover_pct::text ~ '^-?[0-9]+$'
-                then cast(cloudcover_pct::text as integer)
+            when cast(cloudcover_pct as text) ~ '^-?[0-9]+$'
+                then cast(cast(cloudcover_pct as text) as integer)
             else null
         end                                                as cloudcover_pct,
 
         case
-            when cloudcover_low_pct::text ~ '^-?[0-9]+$'
-                then cast(cloudcover_low_pct::text as integer)
+            when cast(cloudcover_low_pct as text) ~ '^-?[0-9]+$'
+                then cast(cast(cloudcover_low_pct as text) as integer)
             else null
         end                                                as cloudcover_low_pct,
 
         case
-            when cloudcover_mid_pct::text ~ '^-?[0-9]+$'
-                then cast(cloudcover_mid_pct::text as integer)
+            when cast(cloudcover_mid_pct as text) ~ '^-?[0-9]+$'
+                then cast(cast(cloudcover_mid_pct as text) as integer)
             else null
         end                                                as cloudcover_mid_pct,
 
         case
-            when cloudcover_high_pct::text ~ '^-?[0-9]+$'
-                then cast(cloudcover_high_pct::text as integer)
+            when cast(cloudcover_high_pct as text) ~ '^-?[0-9]+$'
+                then cast(cast(cloudcover_high_pct as text) as integer)
             else null
         end                                                as cloudcover_high_pct,
 
-        cast(surface_pressure_hpa as text)::double precision as surface_pressure_hpa,
-        cast(pressure_msl_hpa     as text)::double precision as pressure_msl_hpa,
+        cast(cast(surface_pressure_hpa as text) as double precision) as surface_pressure_hpa,
+        cast(cast(pressure_msl_hpa     as text) as double precision) as pressure_msl_hpa,
 
         case
-            when visibility_m::text ~ '^-?[0-9]+(\.[0-9]+)?$'
-                then cast(visibility_m::text as double precision)
+            when cast(visibility_m as text) ~ '^-?[0-9]+(\.[0-9]+)?$'
+                then cast(cast(visibility_m as text) as double precision)
             else null
         end                                                as visibility_m,
 
-        cast(windspeed_10m_ms as text)::double precision   as windspeed_10m_ms,
-        cast(windgusts_10m_ms as text)::double precision   as windgusts_10m_ms,
+        cast(cast(windspeed_10m_ms as text) as double precision) as windspeed_10m_ms,
+        cast(cast(windgusts_10m_ms as text) as double precision) as windgusts_10m_ms,
 
         case
-            when winddirection_10m_deg::text ~ '^-?[0-9]+$'
-                then cast(winddirection_10m_deg::text as integer)
+            when cast(winddirection_10m_deg as text) ~ '^-?[0-9]+$'
+                then cast(cast(winddirection_10m_deg as text) as integer)
             else null
         end                                                as winddirection_10m_deg,
 
         case
-            when weathercode::text ~ '^-?[0-9]+$'
-                then cast(weathercode::text as integer)
+            when cast(weathercode as text) ~ '^-?[0-9]+$'
+                then cast(cast(weathercode as text) as integer)
             else null
         end                                                as weathercode
 
@@ -139,6 +139,45 @@ deduplicated as (
             order by loaded_at desc
         ) as rn
     from typed
+
+),
+
+with_description as (
+
+    select
+        d.source,
+        d.airport_iata,
+        d.loaded_at,
+        d.weather_time_utc,
+
+        d.temperature_2m_c,
+        d.apparent_temperature_c,
+        d.dewpoint_2m_c,
+        d.relative_humidity_2m_pct,
+
+        d.precipitation_mm,
+        d.rain_mm,
+        d.snowfall_cm,
+
+        d.cloudcover_pct,
+        d.cloudcover_low_pct,
+        d.cloudcover_mid_pct,
+        d.cloudcover_high_pct,
+
+        d.surface_pressure_hpa,
+        d.pressure_msl_hpa,
+        d.visibility_m,
+
+        d.windspeed_10m_ms,
+        d.windgusts_10m_ms,
+        d.winddirection_10m_deg,
+
+        d.weathercode,
+        coalesce(w.description, 'Unknown') as weather_description
+
+    from deduplicated d
+    left join {{ ref('wmo_weather_codes') }} w
+        on d.weathercode = w.weathercode
 
 ),
 
@@ -173,41 +212,9 @@ final as (
         winddirection_10m_deg,
 
         weathercode,
+        weather_description
 
-        case weathercode
-            when 0  then 'Clear sky'
-            when 1  then 'Mainly clear'
-            when 2  then 'Partly cloudy'
-            when 3  then 'Overcast'
-            when 45 then 'Fog'
-            when 48 then 'Depositing rime fog'
-            when 51 then 'Light drizzle'
-            when 53 then 'Moderate drizzle'
-            when 55 then 'Dense drizzle'
-            when 56 then 'Light freezing drizzle'
-            when 57 then 'Dense freezing drizzle'
-            when 61 then 'Slight rain'
-            when 63 then 'Moderate rain'
-            when 65 then 'Heavy rain'
-            when 66 then 'Light freezing rain'
-            when 67 then 'Heavy freezing rain'
-            when 71 then 'Slight snowfall'
-            when 73 then 'Moderate snowfall'
-            when 75 then 'Heavy snowfall'
-            when 77 then 'Snow grains'
-            when 80 then 'Slight rain showers'
-            when 81 then 'Moderate rain showers'
-            when 82 then 'Violent rain showers'
-            when 85 then 'Slight snow showers'
-            when 86 then 'Heavy snow showers'
-            when 95 then 'Thunderstorm'
-            when 96 then 'Thunderstorm with hail'
-            when 99 then 'Heavy thunderstorm with hail'
-            else 'Unknown'
-        end as weather_description
-
-    from deduplicated
-    where rn = 1
+    from with_description
 
 )
 

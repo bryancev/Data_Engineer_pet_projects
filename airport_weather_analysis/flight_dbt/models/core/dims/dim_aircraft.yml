@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: dim_aircraft
+    description: "Dimension-модель справочника самолётов"
+
+    columns:
+
+      - name: aircraft_key
+        description: "Технический surrogate key самолёта"
+        tests:
+          - not_null
+          - unique
+
+      - name: aircraft_type
+        description: "Тип или модель самолёта"
+        tests:
+          - not_null
+
+      - name: manufacturer
+        description: "Производитель самолёта"
+        tests:
+          - not_null
+
+      - name: seats
+        description: "Количество пассажирских мест"
+
+      - name: range_km
+        description: "Максимальная дальность полёта в километрах"
+
+      - name: category
+        description: "Категория самолёта"
