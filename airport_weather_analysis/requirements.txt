@@ -6,3 +6,10 @@ requests
 pyarrow
 python-dotenv
 pytest
+jupyter
+matplotlib
+numpy
+scipy
+seaborn
+scikit-learn
+ipykernel

@@ -32,5 +32,31 @@ services:
     volumes:
       - ./data:/data
 
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flight_jupyter
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      PYTHONPATH: /app
+      POSTGRES_HOST: postgres
+    volumes:
+      - ./:/app
+    ports:
+      - "8888:8888"
+    command: >
+      jupyter notebook
+      --ip=0.0.0.0
+      --port=8888
+      --allow-root
+      --no-browser
+      --NotebookApp.token=''
+      --NotebookApp.password=''
+
 volumes:
   postgresql_data:
