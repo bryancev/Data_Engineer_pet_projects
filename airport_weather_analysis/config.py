@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
-from sqlalchemy import URL
+# from sqlalchemy import URL    # ← было
+from sqlalchemy.engine import URL
 import os
 
 load_dotenv()
