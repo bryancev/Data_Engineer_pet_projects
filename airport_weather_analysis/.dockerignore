@@ -4,3 +4,13 @@ __pycache__
 *.pyc
 venv/
 .venv/
+airflow/logs
+airflow/logs/**
+**/__pycache__
+**/*.pyc
+.git
+.venv
+venv
+data
+prometheus_data
+grafana_data
